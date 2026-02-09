@@ -8,5 +8,7 @@ router.use('/withdrawals', require('./withdrawals'));
 router.use('/deposits', require('./deposits'));
 router.use('/auth', require('./auth'));
 router.use('/reports', require('./reports'));
+router.use('/performance', require('./performance'));
+router.use('/audit-logs', require('./audit-logs'));
 
 module.exports = router;

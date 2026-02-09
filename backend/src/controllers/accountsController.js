@@ -6,5 +6,18 @@ function createAccount(req, res) {
   res.status(501).json({ error: 'Not implemented' });
 }
 
-module.exports = { listAccounts, createAccount };
+function getSummary(req, res) {
+  const { id } = req.params;
+  res.json({
+    accountId: id,
+    summary: {
+      balance: 0,
+      equity: 0,
+      drawdownPercent: 0,
+      openTrades: 0,
+    },
+    message: 'Account summary stub',
+  });
+}
 
+module.exports = { listAccounts, createAccount, getSummary };

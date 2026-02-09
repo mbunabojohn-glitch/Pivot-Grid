@@ -12,5 +12,9 @@ router.post('/', requireAuth, async (req, res) => {
   res.status(501).json({ error: 'Not implemented' });
 });
 
-module.exports = router;
+router.get('/:id/summary', requireAuth, async (req, res) => {
+  const { getSummary } = require('../controllers/accountsController');
+  return getSummary(req, res);
+});
 
+module.exports = router;
