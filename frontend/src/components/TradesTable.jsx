@@ -9,6 +9,7 @@ export default function TradesTable({ trades }) {
         <tr>
           <th style={{ textAlign: 'left', padding: 8 }}>Symbol</th>
           <th style={{ textAlign: 'left', padding: 8 }}>Direction</th>
+          <th style={{ textAlign: 'left', padding: 8 }}>Entry Reason</th>
           <th style={{ textAlign: 'left', padding: 8 }}>Entry</th>
           <th style={{ textAlign: 'left', padding: 8 }}>SL</th>
           <th style={{ textAlign: 'left', padding: 8 }}>TP</th>
@@ -22,6 +23,7 @@ export default function TradesTable({ trades }) {
           <tr key={t.tradeId || t._id || Math.random()}>
             <Cell>{t.symbol}</Cell>
             <Cell>{t.direction}</Cell>
+            <Cell>{t.entryReason}</Cell>
             <Cell>{t.entryLimit}</Cell>
             <Cell>{t.sl}</Cell>
             <Cell>{t.tp}</Cell>

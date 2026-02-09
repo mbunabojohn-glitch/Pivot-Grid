@@ -1,5 +1,6 @@
 import { useStore } from '../state/store.jsx'
 import EquityChart from '../components/EquityChart.jsx'
+import { formatCurrency } from '../utils/format.js'
 
 function Stat({ label, value }) {
   return (
@@ -17,8 +18,8 @@ export default function Dashboard() {
   return (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', gap: 12 }}>
-        <Stat label="Balance" value={state.balance.toFixed(2)} />
-        <Stat label="Equity" value={equity.toFixed(2)} />
+        <Stat label="Balance" value={formatCurrency(state.balance)} />
+        <Stat label="Equity" value={formatCurrency(equity)} />
         <Stat label="Drawdown %" value={(state.drawdownPct * 100).toFixed(2)} />
         <Stat label="Open trades" value={openTrades} />
       </div>

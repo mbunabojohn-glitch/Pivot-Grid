@@ -3,12 +3,25 @@ import { connectWS } from '../services/ws.js'
 
 const initialState = {
   connection: { status: 'disconnected' },
-  equity: [],
-  balance: 0,
+  equity: [{ t: Date.now() - 60000, equity: 10000 }, { t: Date.now(), equity: 10020 }],
+  balance: 10000,
   drawdownPct: 0,
-  trades: [],
-  weekly: { grossPnL: 0, netPnL: 0, clientShare: 0, platformShare: 0 },
-  ai: { title: '', text: '' }
+  trades: [
+    {
+      tradeId: 'mock-1',
+      symbol: 'EURUSD',
+      direction: 'BUY',
+      entryLimit: 1.08,
+      sl: 1.075,
+      tp: 1.09,
+      riskPct: 5,
+      state: 'pending',
+      result: { pnl: null },
+      entryReason: 'H4 impulse, Fibonacci 0.55 entry',
+    },
+  ],
+  weekly: { grossPnL: 120, netPnL: 100, clientShare: 80, platformShare: 20 },
+  ai: { title: 'AI Explanation', text: 'Deterministic placeholder explanation' }
 }
 
 function reducer(state, action) {
