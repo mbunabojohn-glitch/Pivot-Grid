@@ -1,6 +1,7 @@
 import { useStore } from '../state/store.jsx'
 import EquityChart from '../components/EquityChart.jsx'
 import { formatCurrency } from '../utils/format.js'
+import { dashboardMock } from '../mocks/dashboard.mock.js'
 
 function Stat({ label, value }) {
   return (
@@ -13,14 +14,18 @@ function Stat({ label, value }) {
 
 export default function Dashboard() {
   const { state } = useStore()
-  const equity = state.equity.length ? state.equity[state.equity.length - 1].equity : 0
-  const openTrades = state.trades.filter((t) => t.state === 'open' || t.state === 'pending').length
+  const equitySeriesLatest = state.equity.length ? state.equity[state.equity.length - 1].equity : 0
+  const openTradesComputed = state.trades.filter((t) => t.state === 'open' || t.state === 'pending').length
+  const balanceCard = dashboardMock?.balance ?? state.balance
+  const equityCard = dashboardMock?.equity ?? equitySeriesLatest
+  const drawdownPercent = dashboardMock?.drawdown ?? state.drawdownPct * 100
+  const openTrades = dashboardMock?.openTrades ?? openTradesComputed
   return (
     <div>
       <div style={{ marginBottom: 16, display: 'flex', gap: 12 }}>
-        <Stat label="Balance" value={formatCurrency(state.balance)} />
-        <Stat label="Equity" value={formatCurrency(equity)} />
-        <Stat label="Drawdown %" value={(state.drawdownPct * 100).toFixed(2)} />
+        <Stat label="Balance" value={formatCurrency(balanceCard)} />
+        <Stat label="Equity" value={formatCurrency(equityCard)} />
+        <Stat label="Drawdown %" value={Number(drawdownPercent).toFixed(2)} />
         <Stat label="Open trades" value={openTrades} />
       </div>
       <EquityChart data={state.equity} />
