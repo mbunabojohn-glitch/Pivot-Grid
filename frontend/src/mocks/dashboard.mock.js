@@ -1,10 +1,6 @@
 export const dashboardMock = {
-  balance: 10000,
-  equity: [
-    { t: Date.now() - 120000, equity: 9980 },
-    { t: Date.now() - 60000, equity: 10010 },
-    { t: Date.now(), equity: 10025 },
-  ],
-  drawdownPct: 0.02,
+  balance: 1200,
+  equity: 1180,
+  drawdown: 5.2,
   openTrades: 1,
-}
+};
