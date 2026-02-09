@@ -15,8 +15,41 @@ function setupWebSocket(server) {
       } catch {
         return;
       }
-      const type = data?.type;
-      const payload = data?.payload;
+      let type = data?.type;
+      let payload = data?.payload;
+      if (!type) {
+        const event = (data?.event || '').toUpperCase();
+        if (event === 'TRADE_OPENED') {
+          type = 'ea:trade_opened';
+          payload = {
+            tradeId: data.tradeId || `${data.symbol || 'UNKNOWN'}-${Date.now()}`,
+            symbol: data.symbol,
+            direction: data.direction,
+            entryLimit: data.entry,
+            sl: data.sl,
+            tp: data.tp,
+            riskPct: data.riskPercent ?? data.riskPct,
+            state: 'pending',
+            entryReason: data.reason,
+          };
+        } else if (event === 'TRADE_UPDATED') {
+          type = 'ea:trade_updated';
+          payload = {
+            tradeId: data.tradeId,
+            sl: data.sl,
+            tp: data.tp,
+            state: data.state,
+            result: data.result,
+          };
+        } else if (event === 'TRADE_CLOSED') {
+          type = 'ea:trade_closed';
+          payload = {
+            tradeId: data.tradeId,
+            state: 'closed',
+            result: data.result,
+          };
+        }
+      }
       if (!type) return;
       await ea.handle(type, payload);
     });
