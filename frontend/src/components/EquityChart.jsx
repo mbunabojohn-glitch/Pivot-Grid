@@ -20,11 +20,14 @@ export default function EquityChart({ data }) {
   const pts = scalePoints(data, width, height)
   const d = pts.map(([x, y]) => `${x},${y}`).join(' ')
   return (
-    <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 8 }}>
-      <div style={{ marginBottom: 8 }}>Growth Curve</div>
-      <svg width={width} height={height}>
-        <polyline points={d} fill="none" stroke="#3b82f6" strokeWidth="2" />
-      </svg>
-    </div>
+    <svg width={width} height={height}>
+      <defs>
+        <linearGradient id="lineGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="var(--primary)" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="var(--primary)" stopOpacity="0.1" />
+        </linearGradient>
+      </defs>
+      <polyline points={d} fill="none" stroke="url(#lineGrad)" strokeWidth="2" />
+    </svg>
   )
 }

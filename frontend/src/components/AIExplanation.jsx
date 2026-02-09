@@ -9,12 +9,15 @@ export default function AIExplanation() {
     state.ai.text ||
     'Trades and drawdowns are explained deterministically based on logged rule-based events.'
   return (
-    <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 12 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div>{title}</div>
-        <div style={{ color: connected ? '#16a34a' : '#ef4444' }}>{connected ? 'WS Connected' : 'WS Disconnected'}</div>
+    <div className="card">
+      <div className="ai-header">
+        <div className="ai-title">{title}</div>
+        <div className="status">
+          <div className="status-dot" style={{ background: connected ? 'var(--success)' : 'var(--danger)' }} />
+          <div>{connected ? 'WS Connected' : 'WS Disconnected'}</div>
+        </div>
       </div>
-      <div style={{ marginTop: 8 }}>{text}</div>
+      <div className="ai-text">{text}</div>
     </div>
   )
 }

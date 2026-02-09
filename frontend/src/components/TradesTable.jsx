@@ -1,22 +1,22 @@
 import React from 'react'
 function Cell({ children }) {
-  return <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{children}</td>
+  return <td>{children}</td>
 }
 
 export default function TradesTable({ trades }) {
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <table className="table">
       <thead>
         <tr>
-          <th style={{ textAlign: 'left', padding: 8 }}>Symbol</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Direction</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Entry Reason</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Entry</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>SL</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>TP</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Risk %</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>State</th>
-          <th style={{ textAlign: 'left', padding: 8 }}>Outcome</th>
+          <th>Symbol</th>
+          <th>Direction</th>
+          <th>Entry Reason</th>
+          <th>Entry</th>
+          <th>SL</th>
+          <th>TP</th>
+          <th>Risk %</th>
+          <th>State</th>
+          <th>Outcome</th>
         </tr>
       </thead>
       <tbody>

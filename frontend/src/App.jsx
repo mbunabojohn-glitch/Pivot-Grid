@@ -1,18 +1,32 @@
+import React from 'react'
 import { Link, Route, Routes, NavLink } from 'react-router-dom'
 import Dashboard from './pages/Dashboard.jsx'
 import Trades from './pages/Trades.jsx'
 import Transparency from './pages/Transparency.jsx'
 import AccountLink from './pages/AccountLink.jsx'
 import AIExplanation from './components/AIExplanation.jsx'
+import { useStore } from './state/store.jsx'
 
 function App() {
+  const { state } = useStore()
+  const connected = state.connection.status === 'connected'
   return (
-    <div style={{ fontFamily: 'system-ui', padding: 16 }}>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-        <NavLink to="/" end>Dashboard</NavLink>
-        <NavLink to="/trades">Trade History</NavLink>
-        <NavLink to="/transparency">Trade Transparency</NavLink>
-        <NavLink to="/account-link">Account Linking</NavLink>
+    <div className="app-shell">
+      <div className="header">
+        <div className="brand">
+          <div className="brand-badge" />
+          <div>Pivot Grid</div>
+        </div>
+        <div className="nav">
+          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/" end>Dashboard</NavLink>
+          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/trades">Trade History</NavLink>
+          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/transparency">Transparency</NavLink>
+          <NavLink className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`} to="/account-link">Account Linking</NavLink>
+        </div>
+        <div className="status">
+          <div className="status-dot" style={{ background: connected ? 'var(--success)' : 'var(--danger)' }} />
+          <div>{connected ? 'WS Connected' : 'WS Disconnected'}</div>
+        </div>
       </div>
       <Routes>
         <Route path="/" element={<Dashboard />} />
@@ -20,7 +34,7 @@ function App() {
         <Route path="/transparency" element={<Transparency />} />
         <Route path="/account-link" element={<AccountLink />} />
       </Routes>
-      <div style={{ marginTop: 24 }}>
+      <div className="section">
         <AIExplanation />
       </div>
     </div>
