@@ -1,3 +1,4 @@
+import React from 'react'
 import { useStore } from '../state/store.jsx'
 import EquityChart from '../components/EquityChart.jsx'
 import { formatCurrency } from '../utils/format.js'

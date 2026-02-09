@@ -1,3 +1,4 @@
+import React from 'react'
 function Cell({ children }) {
   return <td style={{ padding: 8, borderBottom: '1px solid #eee' }}>{children}</td>
 }

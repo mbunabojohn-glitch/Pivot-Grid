@@ -1,3 +1,4 @@
+import React from 'react'
 import { useStore } from '../state/store.jsx'
 import TradesTable from '../components/TradesTable.jsx'
 

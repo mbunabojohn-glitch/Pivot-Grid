@@ -1,3 +1,4 @@
+import React from 'react'
 export default function WeeklySummaryCard({ weekly }) {
   const items = [
     { label: 'Gross PnL', value: weekly.grossPnL ?? 0 },

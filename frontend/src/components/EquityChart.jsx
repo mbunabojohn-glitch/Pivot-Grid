@@ -1,3 +1,4 @@
+import React from 'react'
 function scalePoints(data, width, height) {
   if (!data.length) return []
   const xs = data.map((d) => d.t || Date.now())

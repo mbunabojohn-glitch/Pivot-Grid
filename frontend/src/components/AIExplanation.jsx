@@ -1,3 +1,4 @@
+import React from 'react'
 import { useStore } from '../state/store.jsx'
 
 export default function AIExplanation() {
