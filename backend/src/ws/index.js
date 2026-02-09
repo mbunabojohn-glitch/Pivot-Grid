@@ -1,12 +1,14 @@
 const { WebSocketServer } = require('ws');
+const { registerEAChannel } = require('../sockets/ea');
 
 function setupWebSocket(server) {
   const wss = new WebSocketServer({ server });
+  const ea = registerEAChannel(wss);
 
   wss.on('connection', (ws) => {
     ws.isAlive = true;
     ws.on('pong', () => (ws.isAlive = true));
-    ws.on('message', (msg) => {
+    ws.on('message', async (msg) => {
       let data;
       try {
         data = JSON.parse(msg.toString());
@@ -16,20 +18,7 @@ function setupWebSocket(server) {
       const type = data?.type;
       const payload = data?.payload;
       if (!type) return;
-      const map = {
-        'ea:equity': 'equity_update',
-        'ea:drawdown': 'drawdown_update',
-        'ea:trade_opened': 'trade_opened',
-        'ea:trade_updated': 'trade_updated',
-        'ea:trade_closed': 'trade_closed',
-        'ea:audit': 'audit_event',
-        'ea:profit_split': 'profit_split_ready',
-        'ea:ai_explanation': 'ai_explanation',
-      };
-      const event = map[type];
-      if (event) {
-        wss.broadcast(event, payload);
-      }
+      await ea.handle(type, payload);
     });
   });
 
