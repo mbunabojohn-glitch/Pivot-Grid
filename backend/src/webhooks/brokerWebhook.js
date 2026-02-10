@@ -15,7 +15,10 @@ async function handle(req, res) {
     return res.status(400).json({ error: 'invalid_json' });
   }
   const headerEventId = req.headers['x-event-id'] || req.headers['X-Event-Id'];
-  const eventId = payload.eventId || headerEventId || crypto.createHash('sha256').update(raw).digest('hex');
+  if (!headerEventId) {
+    return res.status(400).json({ error: 'missing_event_id' });
+  }
+  const eventId = headerEventId;
   const existing = await AuditLog.findOne({ eventId }).lean();
   if (existing) {
     return res.json({ ok: true, duplicate: true });
