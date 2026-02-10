@@ -14,7 +14,11 @@ const ProfitSplitSchema = new mongoose.Schema(
     grossProfit: { type: Number, default: 0 },
     clientShare: { type: Number, default: 0 },
     platformShare: { type: Number, default: 0 },
-    status: { type: String, enum: ['pending', 'calculated', 'distributed'], default: 'pending' },
+    status: {
+      type: String,
+      enum: ['PENDING', 'CALCULATED', 'AWAITING_SETTLEMENT', 'SETTLED', 'FAILED'],
+      default: 'PENDING'
+    },
     // legacy fields
     grossPnL: { type: Number, select: false },
     netPnL: { type: Number, select: false },
