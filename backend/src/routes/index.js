@@ -10,5 +10,6 @@ router.use('/auth', require('./auth'));
 router.use('/reports', require('./reports'));
 router.use('/performance', require('./performance'));
 router.use('/audit-logs', require('./audit-logs'));
+router.use('/webhooks', require('./webhooks'));
 
 module.exports = router;

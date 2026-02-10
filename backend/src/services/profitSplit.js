@@ -1,5 +1,6 @@
 const ProfitSplit = require('../models/ProfitSplit')
 const Trade = require('../models/Trade')
+const { loadEnv } = require('../config/env')
 
 function isoWeekString(date = new Date()) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
@@ -21,8 +22,10 @@ async function computeAndRecordProfitSplit(accountId) {
   }).lean()
   const grossProfit = trades.reduce((sum, t) => sum + (t?.outcome?.pnl || 0), 0)
   const normalizedGross = Math.max(0, Number(grossProfit) || 0)
-  const clientShare = Number((normalizedGross * 0.8).toFixed(2))
-  const platformShare = Number((normalizedGross * 0.2).toFixed(2))
+  const env = loadEnv()
+  const platformFeeFrac = Math.min(1, Math.max(0, (env.PLATFORM_FEE_PCT || 20) / 100))
+  const clientShare = Number((normalizedGross * (1 - platformFeeFrac)).toFixed(2))
+  const platformShare = Number((normalizedGross * platformFeeFrac).toFixed(2))
   const split = await ProfitSplit.create({
     accountId,
     week: isoWeekString(periodEnd),
