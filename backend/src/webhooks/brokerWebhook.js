@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const AuditLog = require('../models/AuditLog');
 const { adapter } = require('../integrations/brokerAdapter');
 const { processSettlementEvent } = require('../services/SettlementService');
@@ -13,7 +14,20 @@ async function handle(req, res) {
   } catch {
     return res.status(400).json({ error: 'invalid_json' });
   }
-  await AuditLog.create({ action: `broker_webhook:${payload.event}`, source: 'backend', accountId: payload.accountId, payload, timestamp: new Date() });
+  const headerEventId = req.headers['x-event-id'] || req.headers['X-Event-Id'];
+  const eventId = payload.eventId || headerEventId || crypto.createHash('sha256').update(raw).digest('hex');
+  const existing = await AuditLog.findOne({ eventId }).lean();
+  if (existing) {
+    return res.json({ ok: true, duplicate: true });
+  }
+  await AuditLog.create({
+    action: `broker_webhook:${payload.event}`,
+    source: 'backend',
+    accountId: payload.accountId,
+    eventId,
+    payload,
+    timestamp: new Date()
+  });
   const result = await processSettlementEvent(payload);
   return res.json(result);
 }
