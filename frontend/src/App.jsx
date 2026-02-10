@@ -6,6 +6,8 @@ import Transparency from './pages/Transparency.jsx'
 import AccountLink from './pages/AccountLink.jsx'
 import AIExplanation from './components/AIExplanation.jsx'
 import { useStore } from './state/store.jsx'
+import AI from './pages/AI.jsx'
+import Performance from './pages/Performance.jsx'
 
 function App() {
   const { state } = useStore()
@@ -33,6 +35,8 @@ function App() {
         <Route path="/trades" element={<Trades />} />
         <Route path="/transparency" element={<Transparency />} />
         <Route path="/account-link" element={<AccountLink />} />
+        <Route path="/ai" element={<AI />} />
+        <Route path="/performance" element={<Performance />} />
       </Routes>
       <div className="section">
         <AIExplanation />
