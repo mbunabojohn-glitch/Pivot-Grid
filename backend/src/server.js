@@ -6,13 +6,60 @@ const { loadEnv } = require('./config/env');
 const { connectDB } = require('./config/db');
 const apiRoutes = require('./routes');
 const { setupWebSocket } = require('./ws');
+const { scheduleReconciliation } = require('./services/ReconciliationJob');
+const { adapter } = require('./integrations/brokerAdapter');
+const passport = require('passport');
+const configurePassport = require('./config/passport');
 
 const env = loadEnv();
 const app = express();
+const crypto = require('crypto');
+
+// Request ID and IP tracing
+app.use((req, res, next) => {
+  const id = (req.headers['x-request-id'] && String(req.headers['x-request-id'])) || crypto.randomBytes(16).toString('hex');
+  req.requestId = id;
+  res.setHeader('X-Request-Id', id);
+  req.clientIp = (req.headers['x-forwarded-for'] && String(req.headers['x-forwarded-for']).split(',')[0].trim()) || req.ip || req.connection.remoteAddress;
+  next();
+});
+
+// Minimal security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('X-DNS-Prefetch-Control', 'off');
+  res.setHeader('X-XSS-Protection', '0');
+  next();
+});
 
 app.use(cors({ origin: env.CORS_ORIGIN, credentials: true }));
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(passport.initialize());
+morgan.token('id', (req) => req.requestId);
+morgan.token('ip', (req) => req.clientIp);
+app.use(morgan(':method :url :status - :response-time ms - id=:id ip=:ip'));
+
+// Simple IP-based rate limiting
+const rateState = new Map();
+app.use((req, res, next) => {
+  const now = Date.now();
+  const windowMs = env.RATE_LIMIT_WINDOW_MS;
+  const max = env.RATE_LIMIT_MAX;
+  const key = req.clientIp || 'unknown';
+  const entry = rateState.get(key) || { start: now, count: 0 };
+  if (now - entry.start > windowMs) {
+    entry.start = now;
+    entry.count = 0;
+  }
+  entry.count += 1;
+  rateState.set(key, entry);
+  if (entry.count > max) {
+    return res.status(429).json({ error: 'rate_limited' });
+  }
+  next();
+});
 
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'pivot-grid-backend' });
@@ -30,9 +77,16 @@ const wss = setupWebSocket(server);
   } catch (err) {
     console.error('MongoDB connection failed, continuing without DB', err.message);
   }
+  configurePassport(passport, env);
   server.listen(env.PORT, () => {
     console.log(`Pivot Grid backend listening on port ${env.PORT}`);
   });
+  try {
+    scheduleReconciliation(adapter, env.RECONCILE_INTERVAL_MS);
+    console.log('Reconciliation job scheduled');
+  } catch (e) {
+    console.error('Failed to schedule reconciliation job', e.message);
+  }
 })();
 
 let tick = 0;

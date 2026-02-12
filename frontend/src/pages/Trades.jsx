@@ -7,7 +7,9 @@ export default function Trades() {
   return (
     <div className="card">
       <div className="card-title">Trade History</div>
-      <TradesTable trades={state.trades} />
+      <div className="table-wrap">
+        <TradesTable trades={state.trades} />
+      </div>
     </div>
   )
 }

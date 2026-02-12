@@ -36,6 +36,24 @@ async function storeLog(type, payload) {
   }
 }
 
+let latestTrade = null
+let weeklySummary = null
+let equitySeries = []
+
+function getLatestTrade() {
+  return latestTrade
+}
+
+function getWeeklySummary() {
+  return weeklySummary
+}
+
+function getEquitySeries() {
+  return equitySeries
+}
+
+const { explainTrade } = require('../services/aiExplain');
+
 function registerEAChannel(wss) {
   return {
     async handle(type, payload) {
@@ -53,6 +71,44 @@ function registerEAChannel(wss) {
         'ea:ai_explanation': 'ai_explanation',
       };
       const event = map[type];
+      if (type === 'ea:equity') {
+        if (typeof payload.timestamp === 'number' && typeof payload.equity === 'number') {
+          equitySeries = [...equitySeries, { t: payload.timestamp, equity: payload.equity }].slice(-200)
+        }
+      }
+      if (type === 'ea:trade_opened') {
+        latestTrade = {
+          tradeId: payload.tradeId,
+          symbol: payload.symbol,
+          direction: payload.direction,
+          riskPct: payload.riskPct,
+          sl: payload.sl,
+          tp: payload.tp,
+          entryReason: payload.entryReason,
+          outcome: payload.result?.pnl ?? '',
+          invalidationReason: payload.invalidationReason || ''
+        }
+        try {
+          const expl = await explainTrade(latestTrade);
+          if (expl && expl.text) wss.broadcast('ai_explanation', expl);
+        } catch {}
+      } else if (type === 'ea:trade_updated' || type === 'ea:trade_closed') {
+        if (latestTrade && latestTrade.tradeId === payload.tradeId) {
+          latestTrade = { ...latestTrade, ...payload }
+        }
+        try {
+          const expl = await explainTrade(latestTrade);
+          if (expl && expl.text) wss.broadcast('ai_explanation', expl);
+        } catch {}
+      } else if (type === 'ea:profit_split') {
+        weeklySummary = {
+          grossPnL: payload.grossPnL ?? 0,
+          netPnL: payload.netPnL ?? 0,
+          clientShare: payload.clientShare ?? 0,
+          platformShare: payload.platformShare ?? 0,
+          period: payload.period
+        }
+      }
       if (event) wss.broadcast(event, payload);
       return true;
     },
@@ -62,4 +118,4 @@ function registerEAChannel(wss) {
   };
 }
 
-module.exports = { registerEAChannel };
+module.exports = { registerEAChannel, getLatestTrade, getWeeklySummary, getEquitySeries };

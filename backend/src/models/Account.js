@@ -7,9 +7,10 @@ const AccountSchema = new mongoose.Schema(
     broker: { type: String },
     symbolPermissions: { type: [String], default: ['EURUSD', 'BTCUSD'] },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
+    tradingLocked: { type: Boolean, default: false, index: true },
+    lockedAt: { type: Date, index: true }
   },
   { timestamps: true }
 );
 
 module.exports = mongoose.model('Account', AccountSchema);
-

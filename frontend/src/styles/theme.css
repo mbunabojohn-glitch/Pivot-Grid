@@ -1,13 +1,13 @@
 :root {
-  --bg: #0b1020;
-  --surface: #111731;
-  --surface-alt: #141b3f;
-  --border: #1d254e;
+  --bg: #0b1a0f;
+  --surface: #11231a;
+  --surface-alt: #13271f;
+  --border: #244a37;
   --text: #eef1f8;
   --muted: #9aa4c7;
-  --primary: #4f8cff;
-  --primary-700: #3b6ede;
-  --accent: #8b5cf6;
+  --primary: #22c55e;
+  --primary-700: #16a34a;
+  --accent: #34d399;
   --success: #16a34a;
   --danger: #ef4444;
   --shadow: 0 10px 25px rgba(0,0,0,.35);
@@ -16,7 +16,7 @@
 html, body, #root { height: 100% }
 body {
   margin: 0;
-  background: radial-gradient(1200px 600px at 20% -10%, #0d1430 20%, #0b1020 60%), var(--bg);
+  background: radial-gradient(1200px 600px at 20% -10%, #0e2a1a 20%, #0b1a0f 60%), var(--bg);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
 }
@@ -25,6 +25,8 @@ body {
   margin: 0 auto;
   padding: 24px;
 }
+.table-wrap { overflow-x: auto }
+.table { min-width: 680px }
 .header {
   display: flex;
   align-items: center;
@@ -48,7 +50,7 @@ body {
 .nav {
   display: flex;
   gap: 14px;
-  background: rgba(20,27,63,.6);
+  background: rgba(27,63,44,.6);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 6px;
@@ -65,7 +67,7 @@ body {
 }
 .nav-link.active {
   color: var(--text);
-  background: linear-gradient(135deg, #182154, #12183a);
+  background: linear-gradient(135deg, #12321f, #0f2819);
   border: 1px solid var(--border);
 }
 .status {
@@ -75,7 +77,7 @@ body {
   padding: 6px 10px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: rgba(20,27,63,.5);
+  background: rgba(27,63,44,.5);
   color: var(--muted);
 }
 .status-dot {
@@ -123,7 +125,7 @@ body {
 .table thead th {
   color: var(--muted);
   font-weight: 500;
-  background: rgba(20,27,63,.5);
+  background: rgba(27,63,44,.5);
 }
 .ai-header {
   display: flex;
@@ -136,4 +138,33 @@ body {
 .ai-text {
   margin-top: 8px;
   color: var(--muted);
+}
+
+.detail-row { display: grid; grid-template-columns: 200px 1fr; gap: 8px; margin-bottom: 10px }
+.detail-label { color: var(--muted) }
+.detail-value { color: var(--text) }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px }
+.summary-item { padding: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px }
+.form-row { display: flex; gap: 8px }
+.form-row input { flex: 1 }
+.form-row button { white-space: nowrap }
+
+@media (max-width: 1024px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+  .app-shell { padding: 20px }
+}
+@media (max-width: 768px) {
+  .header { flex-direction: column; align-items: stretch; gap: 12px }
+  .nav { flex-wrap: wrap }
+  .grid { grid-template-columns: 1fr }
+  .card { padding: 14px }
+  .table th, .table td { padding: 8px 10px; font-size: 13px }
+  .brand { font-size: 18px }
+  .detail-row { grid-template-columns: 1fr }
+}
+@media (max-width: 480px) {
+  .app-shell { padding: 16px }
+  .table th, .table td { padding: 6px 8px; font-size: 12px }
+  .form-row { flex-direction: column }
+  .form-row button { width: 100% }
 }
