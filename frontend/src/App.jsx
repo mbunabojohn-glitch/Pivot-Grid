@@ -1,5 +1,5 @@
 import React from 'react'
-import { Link, Route, Routes, NavLink } from 'react-router-dom'
+import { Link, Route, Routes, NavLink, Navigate } from 'react-router-dom'
 import Dashboard from './pages/Dashboard.jsx'
 import Trades from './pages/Trades.jsx'
 import Transparency from './pages/Transparency.jsx'
@@ -8,10 +8,16 @@ import AIExplanation from './components/AIExplanation.jsx'
 import { useStore } from './state/store.jsx'
 import AI from './pages/AI.jsx'
 import Performance from './pages/Performance.jsx'
+import Signup from './pages/Signup.jsx'
 
 function App() {
   const { state } = useStore()
   const connected = state.connection.status === 'connected'
+  function Protected({ children }) {
+    const token = localStorage.getItem('accessToken')
+    if (!token) return <Navigate to="/login" replace />
+    return children
+  }
   return (
     <div className="app-shell">
       <div className="header">
@@ -37,6 +43,7 @@ function App() {
         <Route path="/account-link" element={<AccountLink />} />
         <Route path="/ai" element={<AI />} />
         <Route path="/performance" element={<Performance />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
       </Routes>
       <div className="section">
         <AIExplanation />

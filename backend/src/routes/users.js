@@ -1,7 +1,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const { loadEnv } = require('../config/env');
-const { requireAuth, optionalAuth } = require('../middleware/auth');
+const { requireAuth, optionalAuth } = require('../middleware/auth.middleware');
 const User = require('../models/User');
 
 const env = loadEnv();
@@ -25,4 +25,3 @@ router.get('/', optionalAuth, async (req, res) => {
 });
 
 module.exports = router;
-

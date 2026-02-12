@@ -1,6 +1,8 @@
 const ProfitSplit = require('../models/ProfitSplit')
 const { computeGrossProfit } = require('./ProfitCalculator')
 const { getFeeFraction } = require('./FeePolicy')
+const Account = require('../models/Account')
+const LedgerEntry = require('../models/LedgerEntry')
 
 function isoWeekString(date = new Date()) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
@@ -16,7 +18,7 @@ async function computeAndRecordProfitSplit(accountId) {
   const periodStart = latest?.periodEnd ? new Date(latest.periodEnd) : new Date(0)
   const periodEnd = new Date()
   const normalizedGross = await computeGrossProfit(accountId, periodStart, periodEnd)
-  const platformFeeFrac = getFeeFraction()
+  const platformFeeFrac = getFeeFraction({ accountId, grossProfit: normalizedGross, now: periodEnd })
   const clientShare = Number((normalizedGross * (1 - platformFeeFrac)).toFixed(2))
   const platformShare = Number((normalizedGross * platformFeeFrac).toFixed(2))
   const split = await ProfitSplit.create({
@@ -29,6 +31,18 @@ async function computeAndRecordProfitSplit(accountId) {
     platformShare,
     status: 'CALCULATED'
   })
+  try {
+    const acc = await Account.findById(accountId).lean()
+    const userId = acc?.userId
+    if (userId) {
+      if (normalizedGross > 0) {
+        await LedgerEntry.create({ userId, type: 'PROFIT', debit: 0, credit: normalizedGross, referenceId: String(split._id) })
+      }
+      if (platformShare > 0) {
+        await LedgerEntry.create({ userId, type: 'PLATFORM_FEE', debit: platformShare, credit: 0, referenceId: String(split._id) })
+      }
+    }
+  } catch (_) {}
   return split
 }
 

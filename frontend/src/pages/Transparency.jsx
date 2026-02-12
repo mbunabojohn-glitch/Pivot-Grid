@@ -4,9 +4,9 @@ import WeeklySummaryCard from '../components/WeeklySummaryCard.jsx'
 
 function Row({ label, value }) {
   return (
-    <div style={{ display: 'flex', gap: 8, marginBottom: 10 }}>
-      <div style={{ width: 200, color: 'var(--muted)' }}>{label}</div>
-      <div style={{ color: 'var(--text)' }}>{value}</div>
+    <div className="detail-row">
+      <div className="detail-label">{label}</div>
+      <div className="detail-value">{value}</div>
     </div>
   )
 }

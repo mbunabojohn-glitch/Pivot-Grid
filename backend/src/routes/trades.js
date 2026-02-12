@@ -1,13 +1,20 @@
 const express = require('express');
-const { requireAuth } = require('../middleware/auth');
+const { requireAuth, optionalAuth } = require('../middleware/auth.middleware');
 const Trade = require('../models/Trade');
 const Account = require('../models/Account');
+const { getLatestTrade } = require('../sockets/ea');
 
 const router = express.Router();
 
-router.get('/', requireAuth, async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   const { accountId } = req.query || {};
   res.json({ data: [], message: 'Trades listing stub', accountId });
+});
+
+router.get('/latest', optionalAuth, async (req, res) => {
+  const t = getLatestTrade();
+  if (!t) return res.json({ trade: null });
+  return res.json({ trade: t });
 });
 
 router.post('/', requireAuth, async (req, res) => {

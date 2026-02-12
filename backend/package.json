@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node src/server.js"
+    "dev": "node --dns-result-order=ipv4first src/server.js"
   },
   "bin": {
     "mock-ea": "./mock-ea.js"
@@ -15,11 +15,19 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.1.6",
+    "mongoose": "^9.2.0",
     "morgan": "^1.10.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
     "ws": "^8.19.0"
   }
 }

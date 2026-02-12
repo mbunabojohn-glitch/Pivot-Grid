@@ -11,7 +11,11 @@ const WithdrawalRecordSchema = new mongoose.Schema(
     requestedAt: { type: Date, default: Date.now, index: true },
     status: { type: String, enum: ['pending', 'processing', 'approved', 'completed', 'rejected'], default: 'pending', index: true },
     processedAt: { type: Date },
-    note: { type: String }
+    note: { type: String },
+    brokerRefId: { type: String, index: true },
+    grossProfit: { type: Number },
+    platformFee: { type: Number },
+    traderPayout: { type: Number }
   },
   { timestamps: true }
 );

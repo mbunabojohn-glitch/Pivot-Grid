@@ -1,11 +1,11 @@
 const express = require('express');
-const { requireAuth } = require('../middleware/auth');
+const { optionalAuth } = require('../middleware/auth.middleware');
 const Reports = require('../controllers/reportsController');
 
 const router = express.Router();
 
-router.get('/weekly', requireAuth, Reports.weeklySummary);
-router.get('/growth', requireAuth, Reports.growthCurve);
+router.get('/weekly', optionalAuth, Reports.weeklySummary);
+router.get('/growth', optionalAuth, Reports.growthCurve);
 
 module.exports = router;
 

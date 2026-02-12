@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const AuditLog = require('../models/AuditLog');
 const { adapter } = require('../integrations/brokerAdapter');
-const { processSettlementEvent } = require('../services/SettlementService');
+const { processSettlementEvent, processBrokerRefSettlement } = require('../services/SettlementService');
 
 async function handle(req, res) {
   const raw = req.body;
@@ -23,15 +23,14 @@ async function handle(req, res) {
   if (existing) {
     return res.json({ ok: true, duplicate: true });
   }
-  await AuditLog.create({
-    action: `broker_webhook:${payload.event}`,
-    source: 'backend',
-    accountId: payload.accountId,
-    eventId,
-    payload,
-    timestamp: new Date()
-  });
-  const result = await processSettlementEvent(payload);
+  let action = `broker_webhook:${payload.event || 'generic'}`;
+  await AuditLog.create({ action, source: 'backend', accountId: payload.accountId, eventId, payload, timestamp: new Date() });
+  let result;
+  if (payload && payload.brokerRefId && payload.status && !payload.event) {
+    result = await processBrokerRefSettlement(payload);
+  } else {
+    result = await processSettlementEvent(payload);
+  }
   return res.json(result);
 }
 

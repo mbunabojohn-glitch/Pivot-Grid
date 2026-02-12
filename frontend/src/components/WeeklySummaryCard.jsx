@@ -7,13 +7,13 @@ export default function WeeklySummaryCard({ weekly }) {
     { label: 'Platform Share', value: weekly.platformShare ?? 0 }
   ]
   return (
-    <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 12 }}>
-      <div style={{ marginBottom: 8 }}>Weekly Performance Summary</div>
-      <div style={{ display: 'flex', gap: 12 }}>
+    <div className="card">
+      <div className="card-title">Weekly Performance Summary</div>
+      <div className="summary-grid">
         {items.map((i) => (
-          <div key={i.label} style={{ padding: 8, minWidth: 140, background: '#fafafa', borderRadius: 8 }}>
-            <div style={{ color: '#666' }}>{i.label}</div>
-            <div style={{ fontSize: 18 }}>{i.value}</div>
+          <div key={i.label} className="summary-item">
+            <div className="card-title">{i.label}</div>
+            <div className="card-value">{i.value}</div>
           </div>
         ))}
       </div>

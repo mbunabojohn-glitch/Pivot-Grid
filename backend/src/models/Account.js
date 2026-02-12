@@ -8,6 +8,7 @@ const AccountSchema = new mongoose.Schema(
     symbolPermissions: { type: [String], default: ['EURUSD', 'BTCUSD'] },
     status: { type: String, enum: ['active', 'inactive'], default: 'active' },
     tradingLocked: { type: Boolean, default: false, index: true },
+    lockedAt: { type: Date, index: true }
   },
   { timestamps: true }
 );
