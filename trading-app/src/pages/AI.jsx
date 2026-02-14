@@ -109,7 +109,7 @@ const AI = () => {
   };
   return (
     <Layout>
-      <div className="bg-slate-900 text-gray-100 rounded-xl shadow p-4 sm:p-5 md:p-6">
+      <div className="bg-slate-900 text-gray-100 rounded-xl shadow p-4 sm:p-5 md:p-6 motion-safe:animate-scale-in">
         <h2 className="text-lg sm:text-xl font-semibold mb-2 text-gray-100">AI Assistant</h2>
         <div className="mb-4 flex flex-col sm:flex-row gap-2 sm:gap-3">
           <select

@@ -32,11 +32,40 @@ body {
   min-height: 100vh;
 }
 
+html, body, #root {
+  width: 100% !important;
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  overscroll-behavior-x: none;
+}
+
+img, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Clamp third-party iframes (e.g., Firebase auth helper) */
+iframe {
+  display: block;
+  max-width: 100vw;
+  border: 0;
+}
+
+/* Extra safety: clamp common layout containers */
+main, header, footer, section, nav {
+  max-width: 100vw;
+  overflow-x: clip;
+}
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
 }
 
+/* Force long words/headlines to wrap in tiny viewports */
+h1, h2, h3, p, a, button, span {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 button {
   border-radius: 8px;
   border: 1px solid transparent;

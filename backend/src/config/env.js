@@ -21,6 +21,7 @@ function loadEnv() {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || '',
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET || '',
     GOOGLE_CALLBACK_URL: process.env.GOOGLE_CALLBACK_URL || 'http://localhost:4000/api/auth/google/callback',
+    FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID || '',
     ADMIN_EMAIL: process.env.ADMIN_EMAIL || '',
     SMTP_HOST: process.env.SMTP_HOST || '',
     SMTP_PORT: process.env.SMTP_PORT || '587',

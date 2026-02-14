@@ -25,7 +25,7 @@ const AccountLink = () => {
 
   return (
     <Layout>
-      <div className="bg-slate-900 text-gray-100 rounded-xl shadow p-6">
+      <div className="bg-slate-900 text-gray-100 rounded-xl shadow p-4 sm:p-6">
         <h2 className="text-xl font-semibold mb-4 text-gray-100">Account Linking (MT5)</h2>
         <form onSubmit={save} className="flex flex-col sm:flex-row gap-3">
           <input
@@ -34,7 +34,7 @@ const AccountLink = () => {
             placeholder="Enter MT5 account number"
             className="flex-1 w-full border border-gray-700 bg-gray-900 text-gray-100 placeholder-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button type="submit" className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 w-full sm:w-auto">
+          <button type="submit" className="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 w-full sm:w-auto transform transition-transform sm:hover:scale-[1.02] active:scale-95">
             Save
           </button>
         </form>
