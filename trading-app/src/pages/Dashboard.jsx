@@ -34,7 +34,9 @@ const Dashboard = () => {
 
   const fmt = (n) =>
     (n ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  const latestEquity = state.equity.length ? state.equity[state.equity.length - 1].equity : null;
+  const lastPoint = state.equity.length ? state.equity[state.equity.length - 1] : null;
+  const latestEquity = lastPoint ? lastPoint.equity : null;
+  const latestBalance = lastPoint?.balance ?? state.balance;
   const openTrades = (state.trades || []).filter((t) => t?.result?.pnl == null).length;
 
   return ( 
@@ -50,7 +52,7 @@ const Dashboard = () => {
         <div className="bg-slate-900 text-gray-100 p-4 sm:p-5 md:p-6 rounded-xl shadow min-h-24 motion-safe:animate-scale-in transition-transform sm:hover:-translate-y-0.5"> 
           <h2 className="text-gray-100">Account Balance</h2> 
           <p className="text-2xl font-bold mt-2 text-gray-100">
-            {state.connection.status === 'connected' ? `$${fmt(state.balance)}` : loading ? "Loading..." : `$${fmt(userData?.balance)}`}
+            {state.connection.status === 'connected' ? `$${fmt(latestBalance)}` : loading ? "Loading..." : `$${fmt(userData?.balance)}`}
           </p> 
         </div> 
         <div className="bg-slate-900 text-gray-100 p-4 sm:p-5 md:p-6 rounded-xl shadow min-h-24 motion-safe:animate-scale-in transition-transform sm:hover:-translate-y-0.5"> 
@@ -68,7 +70,7 @@ const Dashboard = () => {
           <p
             className={`text-2xl font-bold mt-2 ${
               state.connection.status === 'connected'
-                ? (state.weekly?.netPnL ?? 0) >= 0 ? "text-green-400" : "text-red-400"
+                ? ((latestEquity ?? 0) - (latestBalance ?? 0)) >= 0 ? "text-green-400" : "text-red-400"
                 : loading
                   ? ""
                   : (userData?.profit ?? 0) >= 0
@@ -77,7 +79,7 @@ const Dashboard = () => {
             }`}
           >
             {state.connection.status === 'connected'
-              ? `${(state.weekly?.netPnL ?? 0) >= 0 ? "+" : "-"}$${fmt(Math.abs(state.weekly?.netPnL ?? 0))}`
+              ? `${((latestEquity ?? 0) - (latestBalance ?? 0)) >= 0 ? "+" : "-"}$${fmt(Math.abs((latestEquity ?? 0) - (latestBalance ?? 0)))}`
               : loading
                 ? "Loading..."
                 : `${(userData?.profit ?? 0) >= 0 ? "+" : "-"}$${fmt(Math.abs(userData?.profit ?? 0))}`}
