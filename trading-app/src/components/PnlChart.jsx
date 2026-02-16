@@ -1,56 +1,66 @@
 import React, { useMemo, useState } from "react";
 
-function toCandles(series) {
+function toLine(series) {
   const pts = Array.isArray(series) ? series : [];
-  if (pts.length < 2) return { candles: [], minX: 0, maxX: 1, minY: 0, maxY: 1 };
-  const base = Number(pts[0]?.equity || 0);
-  const mapped = pts.map((p) => ({
-    t: Number(p.t || p.timestamp || 0),
-    v: Number(p.equity || 0) - base,
-  }));
-  const xs = mapped.map((p) => p.t);
-  const ys = mapped.map((p) => p.v);
+  if (pts.length === 0) return { equity: [], balance: [], profit: [], yMin: 0, yMax: 1, xTicks: [], leftPad: 0, rightPad: 0 };
+  const leftPad = 8;
+  const rightPad = 3;
+  const xs = pts.map((p) => Number(p.t || p.timestamp || 0));
   const minX = Math.min(...xs);
   const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
+  const equityVals = pts.map((p) => Number(p.equity || 0));
+  const balanceVals = pts.map((p) => Number((p.balance ?? p.equity ?? 0)));
+  const profitVals = pts.map((p, i) => equityVals[i] - balanceVals[i]);
+  const minY = Math.min(...equityVals);
+  const maxY = Math.max(...equityVals);
   const spanX = Math.max(1, maxX - minX);
-  const bins = Math.min(40, Math.max(10, Math.floor(mapped.length / 3)));
-  const binSize = spanX / bins;
-  const candles = [];
-  for (let i = 0; i < bins; i++) {
-    const start = minX + i * binSize;
-    const end = start + binSize;
-    const bucket = mapped.filter((p) => p.t >= start && p.t < end);
-    if (!bucket.length) continue;
-    const open = bucket[0].v;
-    const close = bucket[bucket.length - 1].v;
-    let high = -Infinity;
-    let low = Infinity;
-    for (const b of bucket) {
-      if (b.v > high) high = b.v;
-      if (b.v < low) low = b.v;
-    }
-    const cx = ((start + end) / 2 - minX) / spanX * 100;
-    candles.push({ cx, open, close, high, low });
-  }
-  return { candles, minX, maxX, minY, maxY };
+  const spanY = Math.max(1, maxY - minY);
+  const toPoint = (valArr) =>
+    pts.map((p, i) => {
+      const t = Number(p.t || p.timestamp || 0);
+      const v = Number(valArr[i] || 0);
+      const x = leftPad + ((t - minX) / spanX) * (100 - leftPad - rightPad);
+      const y = 100 - ((v - minY) / spanY) * 100;
+      return { x, y, t, v };
+    });
+  const idxs = [0, Math.floor(pts.length * 0.25), Math.floor(pts.length * 0.5), Math.floor(pts.length * 0.75), pts.length - 1];
+  const xTicks = Array.from(new Set(idxs)).map(i => ({ x: toPoint(equityVals)[i].x, t: toPoint(equityVals)[i].t }));
+  return {
+    equity: toPoint(equityVals),
+    balance: toPoint(balanceVals),
+    profit: toPoint(profitVals),
+    yMin: minY,
+    yMax: maxY,
+    xTicks,
+    leftPad,
+    rightPad
+  };
 }
 
 export default function PnlChart({ equity = [] }) {
-  const { candles, minY, maxY } = useMemo(() => toCandles(equity), [equity]);
-  const spanY = Math.max(1, maxY - minY || 1);
-  const toY = (v) => 100 - ((v - minY) / spanY) * 100;
-  const hasData = candles.length > 0;
+  const { equity: eqPts, balance: balPts, profit: profPts, yMin, yMax, xTicks, leftPad, rightPad } = useMemo(() => toLine(equity), [equity]);
+  const hasData = eqPts.length > 1;
   const [hoverIdx, setHoverIdx] = useState(-1);
-  const hover = hoverIdx >= 0 ? candles[hoverIdx] : null;
+  const hover = hoverIdx >= 0 ? eqPts[hoverIdx] : null;
+  const yTicks = useMemo(() => {
+    if (!hasData) return [];
+    const count = 5;
+    const span = Math.max(1, (yMax - yMin) || 1);
+    const arr = [];
+    for (let i = 0; i < count; i++) {
+      const val = yMin + (span * i) / (count - 1);
+      const y = 100 - ((val - yMin) / span) * 100;
+      arr.push({ y, val });
+    }
+    return arr;
+  }, [hasData, yMin, yMax]);
   const onMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     let best = -1;
     let bestDist = Infinity;
-    for (let i = 0; i < candles.length; i++) {
-      const d = Math.abs(candles[i].cx - x);
+    for (let i = 0; i < eqPts.length; i++) {
+      const d = Math.abs(eqPts[i].x - x);
       if (d < bestDist) {
         best = i;
         bestDist = d;
@@ -59,6 +69,18 @@ export default function PnlChart({ equity = [] }) {
     setHoverIdx(best);
   };
   const onLeave = () => setHoverIdx(-1);
+  const stepSegments = useMemo(() => buildStepSegments(eqPts), [eqPts]);
+  const areaPath = useMemo(() => {
+    if (!eqPts || eqPts.length < 2) return '';
+    let d = `M ${eqPts[0].x},${eqPts[0].y}`;
+    for (let i = 0; i < eqPts.length - 1; i++) {
+      const a = eqPts[i];
+      const b = eqPts[i + 1];
+      d += ` H ${b.x} V ${b.y}`;
+    }
+    d += ` L ${eqPts[eqPts.length-1].x},100 L ${eqPts[0].x},100 Z`;
+    return d;
+  }, [eqPts]);
   return (
     <div className="w-full">
       <svg
@@ -68,35 +90,67 @@ export default function PnlChart({ equity = [] }) {
         onMouseMove={onMove}
         onMouseLeave={onLeave}
       >
+        <defs>
+          <linearGradient id="pnlFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#f97316" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+          </linearGradient>
+        </defs>
         <rect x="0" y="0" width="100" height="100" fill="none" />
-        <line x1="0" y1="100" x2="100" y2="100" stroke="#334155" strokeWidth="0.5" />
+        <line x1={leftPad} y1="0" x2={leftPad} y2="100" stroke="#334155" strokeWidth="0.6" />
+        {[20,40,60,80].map((y) => (
+          <line key={y} x1={leftPad} y1={y} x2={100 - rightPad} y2={y} stroke="#1f2937" strokeWidth="0.4" />
+        ))}
+        <line x1={leftPad} y1="100" x2={100 - rightPad} y2="100" stroke="#334155" strokeWidth="0.6" />
+        {yTicks.map((t, i) => (
+          <text key={i} x={leftPad + 1.5} y={t.y - 0.5} textAnchor="start" fill="#9ca3af" fontSize="2.8">
+            {formatMoney(Math.round(t.val))}
+          </text>
+        ))}
         {hasData ? (
           <>
-            {candles.map((c, i) => {
-              const up = c.close >= c.open;
-              const bodyTop = toY(Math.max(c.open, c.close));
-              const bodyBottom = toY(Math.min(c.open, c.close));
-              const bodyHeight = Math.max(0.8, bodyBottom - bodyTop);
-              const wickTop = toY(c.high);
-              const wickBottom = toY(c.low);
-              const color = up ? "#16a34a" : "#dc2626";
-              const x = c.cx;
-              return (
-                <g key={i}>
-                  <line x1={x} y1={wickTop} x2={x} y2={wickBottom} stroke={color} strokeWidth="0.8" />
-                  <rect x={x - 1.2} y={bodyTop} width={2.4} height={bodyHeight} fill={color} rx="0.6" />
-                </g>
-              );
-            })}
+            <path d={areaPath} fill="url(#pnlFill)" />
+            {stepSegments.map((s, i) => (
+              <path key={i} d={s.d} fill="none" stroke={s.color} strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round" />
+            ))}
+            <polyline
+              points={eqPts.map(p => `${p.x},${p.y}`).join(' ')}
+              fill="none"
+              stroke="#94a3b8"
+              strokeWidth="0.8"
+              strokeDasharray="2 2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+            <polyline
+              points={balPts.map(p => `${p.x},${p.y}`).join(' ')}
+              fill="none"
+              stroke="#64748b"
+              strokeWidth="0.8"
+              strokeDasharray="2 2"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+            />
+            {eqPts.map((p, i) => (
+              <circle key={i} cx={p.x} cy={p.y} r={i === hoverIdx ? 1.2 : 0.9} fill="#f97316" />
+            ))}
+            {xTicks.map((t,i) => (
+              <text key={i} x={t.x} y="98" textAnchor="middle" fill="#9ca3af" fontSize="2.8">
+                {new Date(t.t).toLocaleDateString(undefined, { month: 'numeric', day: 'numeric' })}
+              </text>
+            ))}
             {hover ? (
               <>
-                <line x1={hover.cx} y1="0" x2={hover.cx} y2="100" stroke="#94a3b8" strokeDasharray="1 2" strokeWidth="0.5" />
-                <rect x={Math.min(hover.cx + 2, 70)} y="4" width="28" height="18" rx="2" fill="#0f172a" stroke="#334155" strokeWidth="0.4" />
-                <text x={Math.min(hover.cx + 4, 72)} y="11" fill="#e5e7eb" fontSize="4.2">
-                  {hover.close >= hover.open ? "Up" : "Down"}
+                <line x1={hover.x} y1="0" x2={hover.x} y2="100" stroke="#94a3b8" strokeDasharray="1 2" strokeWidth="0.5" />
+                <rect x={Math.min(hover.x + 2, 52)} y="4" width="46" height="22" rx="2" fill="#0b1220" stroke="#334155" strokeWidth="0.4" />
+                <text x={Math.min(hover.x + 4, 65)} y="11" fill="#e5e7eb" fontSize="4.2">
+                  Equity: {formatMoney(hover.v)}
                 </text>
-                <text x={Math.min(hover.cx + 4, 72)} y="16" fill="#9ca3af" fontSize="3.6">
-                  O:{(hover.open).toFixed(2)} C:{(hover.close).toFixed(2)}
+                <text x={Math.min(hover.x + 4, 65)} y="16" fill="#9ca3af" fontSize="3.6">
+                  Balance: {formatMoney(balPts[hoverIdx]?.v ?? 0)}  Profit: {formatSigned((eqPts[hoverIdx]?.v ?? 0) - (balPts[hoverIdx]?.v ?? 0))}
+                </text>
+                <text x={Math.min(hover.x + 4, 65)} y="20.5" fill="#9ca3af" fontSize="3.2">
+                  {new Date(hover.t).toLocaleDateString()}
                 </text>
               </>
             ) : null}
@@ -109,4 +163,36 @@ export default function PnlChart({ equity = [] }) {
       </svg>
     </div>
   );
+}
+
+function formatK(n) {
+  const v = Number(n || 0);
+  if (v >= 1000) return `${(v/1000).toFixed(1)}k`;
+  return v.toFixed(0);
+}
+
+function formatSigned(n) {
+  const v = Number(n || 0);
+  const abs = Math.abs(v);
+  const s = abs >= 1000 ? `${(abs/1000).toFixed(1)}k` : abs.toFixed(0);
+  return `${v >= 0 ? '+' : '-'}${s}`;
+}
+
+function formatMoney(n) {
+  const v = Number(n || 0);
+  if (Math.abs(v) >= 1000) return `$${(v/1000).toFixed(1)}k`;
+  return `$${v.toFixed(0)}`;
+}
+
+function buildStepSegments(points) {
+  if (!points || points.length < 2) return [];
+  const segs = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i + 1];
+    const color = b.y <= a.y ? '#22c55e' : '#dc2626';
+    const d = `M ${a.x},${a.y} H ${b.x} V ${b.y}`;
+    segs.push({ d, color });
+  }
+  return segs;
 }

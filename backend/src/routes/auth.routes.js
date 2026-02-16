@@ -9,6 +9,49 @@ const router = express.Router();
 router.post('/signup', Auth.signup);
 router.post('/login', Auth.login);
 router.post('/logout', (req, res) => res.status(501).json({ error: 'Not implemented' }));
+router.post('/exchange', express.json(), async (req, res) => {
+  try {
+    const { idToken } = req.body || {};
+    if (!idToken) return res.status(400).json({ error: 'missing_id_token' });
+    const fetchUrl = `https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(idToken)}`;
+    const resp = await fetch(fetchUrl);
+    if (!resp.ok) return res.status(401).json({ error: 'invalid_id_token' });
+    const info = await resp.json();
+    const env = require('../config/env').loadEnv();
+    const audOk = info?.aud && env.FIREBASE_PROJECT_ID && String(info.aud) === String(env.FIREBASE_PROJECT_ID);
+    const issOk = info?.iss && env.FIREBASE_PROJECT_ID && String(info.iss).includes(env.FIREBASE_PROJECT_ID);
+    if (env.FIREBASE_PROJECT_ID && !(audOk || issOk)) {
+      return res.status(401).json({ error: 'aud_mismatch' });
+    }
+    const email = info?.email || '';
+    const uid = info?.user_id || info?.sub || '';
+    if (!email && !uid) return res.status(401).json({ error: 'invalid_payload' });
+    const User = require('../models/User');
+    let user = null;
+    if (email) user = await User.findOne({ email });
+    if (!user && uid) user = await User.findOne({ googleId: uid });
+    if (!user) {
+      user = await User.create({
+        email: email || `${uid}@users.local`,
+        googleId: uid || undefined,
+        tradingLocked: false
+      });
+    } else if (uid && !user.googleId) {
+      user.googleId = uid;
+      await user.save();
+    }
+    const { generateAccessToken, generateRefreshToken } = require('../services/token.service');
+    const accessToken = generateAccessToken(user);
+    const refreshToken = await generateRefreshToken(user);
+    return res.json({
+      user: { id: String(user._id), email: user.email },
+      accessToken,
+      refreshToken
+    });
+  } catch (e) {
+    return res.status(500).json({ error: 'exchange_failed' });
+  }
+});
 router.post('/kyc/start', requireAuth, async (req, res) => {
   try {
     const provider = String((req.body && req.body.provider) || '').toLowerCase();

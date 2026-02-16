@@ -1,8 +1,11 @@
+import { wsUrl } from "../config/api";
+
 export function connectWS(dispatch) {
   let ws
   let timer
   function open() {
-    ws = new WebSocket('ws://localhost:4000')
+    const url = wsUrl()
+    ws = new WebSocket(url)
     ws.onopen = () => dispatch({ type: 'connection_open' })
     ws.onmessage = (e) => {
       try {

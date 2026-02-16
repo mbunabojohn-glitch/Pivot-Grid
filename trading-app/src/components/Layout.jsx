@@ -15,7 +15,7 @@ const Layout = ({ children }) => {
   }; 
  
   return ( 
-    <div className="flex min-h-screen bg-gray-950"> 
+    <div className="flex min-h-screen bg-gray-950 w-full max-w-[100vw] overflow-x-hidden"> 
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-gray-900 text-white flex items-center justify-between px-4 py-3 border-b border-gray-800 z-40">
         <button
           aria-label="Open menu"
@@ -40,12 +40,12 @@ const Layout = ({ children }) => {
           <h2 className="text-2xl font-bold">PivotGrid</h2>
         </div>
         <nav className="space-y-2"> 
-          <NavLink to="/dashboard" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'}`}>Dashboard</NavLink> 
-          <NavLink to="/trades" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'}`}>Trades</NavLink> 
-          <NavLink to="/performance" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'}`}>Performance</NavLink> 
-          <NavLink to="/account-link" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'}`}>Account Link</NavLink> 
-          <NavLink to="/ai" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'}`}>AI Assistant</NavLink> 
-          <NavLink to="/withdraw" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'}`}>Withdraw</NavLink> 
+          <NavLink to="/dashboard" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded transition-transform ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'} sm:hover:translate-x-0.5`}>Dashboard</NavLink> 
+          <NavLink to="/trades" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded transition-transform ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'} sm:hover:translate-x-0.5`}>Trades</NavLink> 
+          <NavLink to="/performance" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded transition-transform ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'} sm:hover:translate-x-0.5`}>Performance</NavLink> 
+          <NavLink to="/account-link" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded transition-transform ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'} sm:hover:translate-x-0.5`}>Account Link</NavLink> 
+          <NavLink to="/ai" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded transition-transform ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'} sm:hover:translate-x-0.5`}>AI Assistant</NavLink> 
+          <NavLink to="/withdraw" onClick={() => setOpen(false)} className={({ isActive }) => `block px-3 py-2 rounded transition-transform ${isActive ? 'bg-gray-800' : 'hover:bg-gray-800'} sm:hover:translate-x-0.5`}>Withdraw</NavLink> 
         </nav> 
         <div className="mt-auto"> 
           {currentUser && ( 
@@ -61,8 +61,8 @@ const Layout = ({ children }) => {
           </button> 
         </div> 
       </aside> 
-      <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 pt-14 md:pt-8 lg:ml-64"> 
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8 pt-14 md:pt-8 lg:ml-64 overflow-x-hidden max-w-[100vw]"> 
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 overflow-x-hidden max-w-[100vw]">
           {children}
         </div>
       </main> 

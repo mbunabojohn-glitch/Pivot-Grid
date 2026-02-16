@@ -20,7 +20,7 @@ function reducer(state, action) {
     case 'equity_update':
       return {
         ...state,
-        equity: [...state.equity, { t: action.payload.timestamp, equity: action.payload.equity }],
+        equity: [...state.equity, { t: action.payload.timestamp, equity: action.payload.equity, balance: action.payload.balance }],
         balance: action.payload.balance ?? state.balance
       }
     case 'drawdown_update':

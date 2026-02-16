@@ -65,6 +65,28 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'pivot-grid-backend' });
 });
 
+app.get('/db/health', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const state = mongoose.connection.readyState;
+    let ping = null;
+    let ok = false;
+    if (mongoose.connection && mongoose.connection.db) {
+      ping = await mongoose.connection.db.admin().command({ ping: 1 });
+      ok = Boolean(ping && ping.ok === 1);
+    } else {
+      ok = state === 1;
+    }
+    res.json({
+      ok,
+      state,
+      name: mongoose.connection && mongoose.connection.name || null
+    });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: e.message });
+  }
+});
+
 app.use('/api', apiRoutes);
 
 const server = http.createServer(app);

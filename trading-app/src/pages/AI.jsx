@@ -1,6 +1,7 @@
 import Layout from "../components/Layout";
 import { useEffect, useState } from "react";
 import { useStore } from "../state/store.jsx";
+import { apiUrl } from "../config/api";
 
 const AI = () => {
   const { state } = useStore();
@@ -10,7 +11,7 @@ const AI = () => {
   const [loadingExplain, setLoadingExplain] = useState(false);
   const [history, setHistory] = useState([]);
   useEffect(() => {
-    fetch("/api/ai/explain")
+    fetch(apiUrl("/api/ai/explain"))
       .then((r) => r.json())
       .then((data) => {
         if (data?.title || data?.text || data?.entryRationale || data?.tpReason || data?.slReason) {
@@ -24,7 +25,7 @@ const AI = () => {
         }
       })
       .catch(() => {});
-    fetch("/api/ai/drawdown")
+    fetch(apiUrl("/api/ai/drawdown"))
       .then((r) => r.json())
       .then((data) => {
         if (data?.title || data?.text) {
@@ -40,7 +41,7 @@ const AI = () => {
     if (!id) return;
     setLoadingExplain(true);
     try {
-      const r = await fetch(`/api/ai/explain/${encodeURIComponent(id)}`);
+      const r = await fetch(apiUrl(`/api/ai/explain/${encodeURIComponent(id)}`));
       const data = await r.json();
       if (data?.title || data?.text || data?.entryRationale || data?.tpReason || data?.slReason) {
         setExplanation({
@@ -109,7 +110,7 @@ const AI = () => {
   };
   return (
     <Layout>
-      <div className="bg-slate-900 text-gray-100 rounded-xl shadow p-4 sm:p-5 md:p-6">
+      <div className="bg-slate-900 text-gray-100 rounded-xl shadow p-4 sm:p-5 md:p-6 motion-safe:animate-scale-in">
         <h2 className="text-lg sm:text-xl font-semibold mb-2 text-gray-100">AI Assistant</h2>
         <div className="mb-4 flex flex-col sm:flex-row gap-2 sm:gap-3">
           <select
