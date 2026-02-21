@@ -6,7 +6,7 @@ import trades from './trades.js';
 import withdrawals from './withdrawals.js';
 import deposits from './deposits.js';
 import auth from './auth.routes.js';
-import reports from './reports.js';
+import reports from './reports.mjs';
 import performance from './performance.js';
 import auditLogs from './audit-logs.js';
 import webhooks from './webhooks.js';
