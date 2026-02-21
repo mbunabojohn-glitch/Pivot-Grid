@@ -1,16 +1,16 @@
 import express from 'express';
 
 import users from './users.mjs';
-import accounts from './accounts.js';
-import trades from './trades.js';
-import withdrawals from './withdrawals.js';
-import deposits from './deposits.js';
+import accounts from './accounts.mjs';
+import trades from './trades.mjs';
+import withdrawals from './withdrawals.mjs';
+import deposits from './deposits.mjs';
 import auth from './auth.routes.js';
 import reports from './reports.mjs';
-import performance from './performance.js';
-import auditLogs from './audit-logs.js';
-import webhooks from './webhooks.js';
-import admin from './admin.js';
+import performance from './performance.mjs';
+import auditLogs from './audit-logs.mjs';
+import webhooks from './webhooks.mjs';
+import admin from './admin.mjs';
 import ai from './ai.js';
 
 const router = express.Router();
