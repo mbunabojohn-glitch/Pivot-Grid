@@ -1,10 +1,9 @@
 import express from 'express';
 import authMw from '../middleware/auth.middleware.js';
 import Account from '../models/Account.js';
-import accountsCtrl from '../controllers/accountsController.js';
+import { getSummary } from '../controllers/accountsController.mjs';
 
 const { requireAuth } = authMw;
-const { getSummary } = accountsCtrl;
 
 const router = express.Router();
 

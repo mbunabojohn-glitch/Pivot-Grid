@@ -1,9 +1,8 @@
 import express from 'express';
 import authShorthand from '../middleware/auth.js';
-import ctrl from '../controllers/auditLogsController.js';
+import { listAuditLogs } from '../controllers/auditLogsController.mjs';
 
 const { requireAuth } = authShorthand;
-const { listAuditLogs } = ctrl;
 
 const router = express.Router();
 
