@@ -5,25 +5,20 @@ import morgan from 'morgan';
 import crypto from 'node:crypto';
 import passport from 'passport';
 
-import envMod from './config/env.js';
-const { loadEnv } = envMod;
+import { loadEnv } from './config/env.mjs';
 
-import dbMod from './config/db.js';
-const { connectDB } = dbMod;
+import { connectDB } from './config/db.mjs';
 
 import apiRoutes from './routes/index.mjs';
 
-import wsMod from './ws/index.js';
-const { setupWebSocket } = wsMod;
+import { setupWebSocket } from './ws/index.mjs';
 
 import reconMod from './services/ReconciliationJob.js';
 const { scheduleReconciliation } = reconMod;
 
-import brokerMod from './integrations/brokerAdapter.js';
-const { adapter } = brokerMod;
+import { adapter } from './integrations/brokerAdapter.mjs';
 
-import configurePassportDefault from './config/passport.js';
-const configurePassport = configurePassportDefault.default || configurePassportDefault;
+import configurePassport from './config/passport.mjs';
 
 const env = loadEnv();
 const app = express();
