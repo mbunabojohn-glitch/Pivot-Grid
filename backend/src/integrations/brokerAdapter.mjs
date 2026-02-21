@@ -1,5 +1,4 @@
-import envMod from '../config/env.mjs';
-const { loadEnv } = envMod;
+import { loadEnv } from '../config/env.mjs';
 
 import demoMod from '../adapters/DemoAdapter.js';
 const { DemoAdapter } = demoMod;

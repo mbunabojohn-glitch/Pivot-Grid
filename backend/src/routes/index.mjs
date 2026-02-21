@@ -1,6 +1,6 @@
 import express from 'express';
 
-import users from './users.js';
+import users from './users.mjs';
 import accounts from './accounts.js';
 import trades from './trades.js';
 import withdrawals from './withdrawals.js';

@@ -1,5 +1,4 @@
-import wsPkg from 'ws';
-const { WebSocketServer } = wsPkg;
+import { WebSocketServer } from 'ws';
 import eaMod from '../sockets/ea.js';
 const { registerEAChannel } = eaMod;
 
