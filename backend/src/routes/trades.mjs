@@ -1,7 +1,8 @@
 import express from 'express';
 import authMw from '../middleware/auth.middleware.js';
-import Account from '../models/Account.js';
+import Account from '../models/Account.mjs';
 import ea from '../sockets/ea.js';
+import { analytics } from '../controllers/tradesController.mjs';
 
 const { requireAuth, optionalAuth } = authMw;
 const { getLatestTrade } = ea;
@@ -32,5 +33,7 @@ router.post('/', requireAuth, async (req, res) => {
     return res.status(500).json({ error: 'Failed to accept trade' });
   }
 });
+
+router.get('/analytics', requireAuth, analytics);
 
 export default router;
