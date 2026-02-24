@@ -1,6 +1,7 @@
 import { WebSocketServer } from 'ws';
 import eaMod from '../sockets/ea.js';
-const { registerEAChannel } = eaMod;
+const { registerEAChannel, getEquitySeries } = eaMod;
+import { persistSnapshot, computeDrawdownFromSeries } from '../services/EquityTracking.mjs';
 
 export function setupWebSocket(server) {
   const wss = new WebSocketServer({ server });
@@ -74,6 +75,25 @@ export function setupWebSocket(server) {
       }
     });
   };
+
+  // Persist equity snapshot every 15 minutes
+  setInterval(async () => {
+    try {
+      const series = getEquitySeries();
+      const last = Array.isArray(series) && series.length ? series[series.length - 1] : null;
+      if (!last) return;
+      const drawdownPct = computeDrawdownFromSeries(series);
+      const ts = new Date();
+      await persistSnapshot({
+        accountId: null,
+        timestamp: ts,
+        equity: Number(last.equity || 0),
+        balance: Number(last.balance || 0),
+        floatingPnL: 0,
+        drawdownPercent: drawdownPct
+      });
+    } catch {}
+  }, 15 * 60 * 1000);
 
   return wss;
 }
